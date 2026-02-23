@@ -1,6 +1,6 @@
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
-import SignInBtn from "../ui/SignInBtn";
+import Button from "../ui/Button";
 import Link from "next/link";
 import NavUser from "../ui/NavUser";
 
@@ -24,7 +24,7 @@ async function Nav() {
         <Link href="/browse" className={navLinkStyles}>
           Browse
         </Link>
-        {session ? <NavUser user={session.user} /> : <SignInBtn />}
+        {session ? <NavUser user={session.user} /> : <Button text="Sign in" link="/signin" primary />}
       </div>
     </div>
   );
