@@ -1,36 +1,60 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# [AniHub](https://anihub-app.vercel.app)
 
-## Getting Started
+![Next.js](https://img.shields.io/badge/Next.js-black?style=for-the-badge&logo=next.js)
+![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178c6?style=for-the-badge&logo=typescript&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
+![Prisma](https://img.shields.io/badge/Prisma-3982CE?style=for-the-badge&logo=Prisma&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)
+![Vercel](https://img.shields.io/badge/Vercel-black?style=for-the-badge&logo=vercel)
 
-First, run the development server:
+AniHub is a better MyAnimeList alternative for tracking anime series and movies you watched and discussing them with other people! AniHub is a fullstack platform built for the anime community, by the anime community.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Tech stack
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+This is a [Next.js](https://nextjs.org) app hosted on [Vercel](https://vercel.com) and [Neon](https://neon.com), built with [React](https://react.dev), [TypeScript](https://typescriptlang.org), [Prisma](https://www.prisma.io/), [PostgreSQL](https://www.postgresql.org/), and [Tailwind](https://tailwindcss.com), and the libraries [Better Auth](https://www.better-auth.com), [Framer Motion](https://motion.dev), and [React Icons](https://react-icons.github.io). The app folder contains the frontend page routes and the backend API endpoints. The components folder contains frontend layout and UI components. The prisma folder contains the Prisma schema, and the lib and types folders contain extra stuff for setup. Finally, the public folder contains frontend assets like icons and logos.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Quick start
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+To host AniHub on your machine for local development or other purposes, simply follow these steps below:
 
-## Learn More
+1. Clone the GitHub [repository](https://github.com/tonymac129/anihub) using the command
+   ```bash
+   git clone https://github.com/tonymac129/anihub.git
+   ```
+2. Open it with your favorite code editor or through the terminal
+3. Create the file `.env` at the root folder and initialize the following variables:
+   ```
+   DATABASE_URL=your_pooled_neon_connection_string
+   DIRECT_URL=your_neon_connection_string
+   BETTER_AUTH_SECRET=your_better_auth_secret
+   BETTER_AUTH_URL=http://localhost:3000
+   GITHUB_CLIENT_ID=your_github_id
+   GITHUB_CLIENT_SECRET=your_github_secret
+   ```
+4. If you don't have a local Postgres database or a cloud Neon/Supabase cluster/connection string, only the landing page will be available because of obvious reasons
+5. Open the terminal and run the commands
 
-To learn more about Next.js, take a look at the following resources:
+   ```bash
+   npm install
+   npm run dev
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+   or if you have Yarn
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+   ```bash
+   yarn install
+   yarn dev
+   ```
 
-## Deploy on Vercel
+   to start the Next.js dev server at localhost:3000 and see the magic!
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Contribution
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Any kind of contribution is welcome, but please follow the guideline below!
+
+- Submit an issue if there's a bug/issue or if you want to suggest new features/subscriptions to be added.
+- Submit a pull request if you want to add or improve the code base!
+- Commit messages should be specific and address the issue
+- Please don't submit random issues that aren't specific
+- Please don't submit pull requests that "fix typo" or "improve formatting"
