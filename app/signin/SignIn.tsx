@@ -5,7 +5,6 @@ import { authClient } from "@/lib/auth-client";
 import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
 import Provider from "./Provider";
-import { redirect } from "next/navigation";
 
 const providers = ["Google", "GitHub"];
 
@@ -35,7 +34,7 @@ function SignIn() {
             setLoading(true);
           },
           onSuccess: () => {
-            redirect("/profile");
+            window.location.reload();
           },
           onError: (ctx) => {
             setLoading(false);

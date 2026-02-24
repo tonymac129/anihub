@@ -15,7 +15,7 @@ function Provider({ provider }: { provider: string }) {
 
   async function signIn() {
     setLoading(true);
-    await authClient.signIn.social({ provider: provider.toLowerCase() });
+    await authClient.signIn.social({ provider: provider.toLowerCase(), callbackURL: "/profile" });
   }
 
   return (
