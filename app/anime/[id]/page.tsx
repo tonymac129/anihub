@@ -9,11 +9,11 @@ import Episode from "@/components/anime/Episode";
 
 async function Page({ params }: { params: { id: string } }) {
   const { id } = await params;
-  const result: TmdbResponseType = await fetch("https://api.themoviedb.org/3/tv/" + id, tmdbOptions as RequestInit).then((res) =>
+  const result = (await fetch("https://api.themoviedb.org/3/tv/" + id, tmdbOptions as RequestInit).then((res) =>
     res.json(),
-  );
+  )) as TmdbResponseType;
   console.log(result);
-  if (result.success === false) notFound();
+  if ("success" in result && result.success === false) notFound();
   const keywords: KeywordsType = await fetch(`https://api.themoviedb.org/3/tv/${id}/keywords`, tmdbOptions as RequestInit).then(
     (res) => res.json(),
   );
@@ -28,7 +28,7 @@ async function Page({ params }: { params: { id: string } }) {
   const imdbEpisodes: EpisodeType[] = [];
   let pageToken = null;
   for (let i = 0; i < Math.ceil(result.number_of_episodes / 50); i++) {
-    const episodeBatch = await fetch(
+    const episodeBatch: { episodes: EpisodeType[]; nextPageToken: string } = await fetch(
       `https://api.imdbapi.dev/titles/${externalIDs.imdb_id}/episodes?pageSize=50${pageToken ? "&pageToken=" + pageToken : ""}`,
     ).then((res) => res.json());
     imdbEpisodes.push(...episodeBatch.episodes);
