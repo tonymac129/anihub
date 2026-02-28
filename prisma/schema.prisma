@@ -23,6 +23,7 @@ model User {
   updatedAt     DateTime  @updatedAt
   sessions      Session[]
   accounts      Account[]
+  comments      Comment[]
 
   @@map("user")
 }
@@ -73,4 +74,19 @@ model Verification {
 
   @@index([identifier])
   @@map("verification")
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  text      String
+  animeId   Int
+  anime     Anime    @relation(fields: [animeId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Anime {
+  id       Int       @id
+  comments Comment[]
 }

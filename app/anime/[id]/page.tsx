@@ -6,19 +6,20 @@ import Tag from "@/components/ui/Tag";
 import Link from "next/link";
 import Image from "next/image";
 import Episode from "@/components/anime/Episode";
+import Discussion from "./Discussion";
+
+type GroupedType = Record<string, EpisodeType[]>;
 
 async function Page({ params }: { params: { id: string } }) {
   const { id } = await params;
   const result = (await fetch("https://api.themoviedb.org/3/tv/" + id, tmdbOptions as RequestInit).then((res) =>
     res.json(),
   )) as TmdbResponseType;
-  console.log(result);
   if ("success" in result && result.success === false) notFound();
   const keywords: KeywordsType = await fetch(`https://api.themoviedb.org/3/tv/${id}/keywords`, tmdbOptions as RequestInit).then(
     (res) => res.json(),
   );
   if (!keywords.results.find((result) => result.id === 210024)) notFound();
-
   const externalIDs = await fetch(`https://api.themoviedb.org/3/tv/${id}/external_ids`, tmdbOptions as RequestInit).then((res) =>
     res.json(),
   );
@@ -34,7 +35,14 @@ async function Page({ params }: { params: { id: string } }) {
     imdbEpisodes.push(...episodeBatch.episodes);
     if (episodeBatch.nextPageToken) pageToken = episodeBatch.nextPageToken;
   }
-  console.log(imdbEpisodes);
+  const grouped: GroupedType = imdbEpisodes.reduce((acc, episode) => {
+    if (acc[episode.season as keyof GroupedType]) {
+      acc[episode.season].push(episode);
+    } else {
+      acc[episode.season] = [episode];
+    }
+    return acc;
+  }, {} as GroupedType);
 
   return (
     <div className="px-50">
@@ -58,6 +66,11 @@ async function Page({ params }: { params: { id: string } }) {
           />
           <div className="flex flex-col gap-y-1">
             <h2 className="font-bold text-2xl text-white">{result.name}</h2>
+            <h4 className="text-sm">{result.original_name}</h4>
+            <h4 className="text-sm">
+              {new Date(result.first_air_date).getFullYear()} —{" "}
+              {result.status === "Ended" ? new Date(result.last_air_date).getFullYear() : "Now"}
+            </h4>
             <div className="flex gap-x-2 items-center">
               <FaStar size={20} />
               <span className="text-lg font-bold">{imdbData.rating.aggregateRating}</span>
@@ -68,17 +81,20 @@ async function Page({ params }: { params: { id: string } }) {
             <p>Type: TV Series</p>
             <p>Episodes: {result.number_of_episodes}</p>
             <p>Status: {result.status}</p>
+            <p>Episode length: {result.episode_run_time}m</p>
             <p>First aired: {new Date(result.first_air_date).toLocaleDateString()}</p>
             <p>Last aired: {new Date(result.last_air_date).toLocaleDateString()}</p>
-            <p>
-              Created by:{" "}
-              {result.created_by.map((credit, i) => (
-                <span key={credit.id}>
-                  {credit.name}
-                  {i !== result.created_by.length - 1 ? ", " : ""}
-                </span>
-              ))}
-            </p>
+            {result.created_by.length > 0 && (
+              <p>
+                Created by:{" "}
+                {result.created_by.map((credit, i) => (
+                  <span key={credit.id}>
+                    {credit.name}
+                    {i !== result.created_by.length - 1 ? ", " : ""}
+                  </span>
+                ))}
+              </p>
+            )}
           </div>
           <Link
             href={result.homepage!}
@@ -104,14 +120,26 @@ async function Page({ params }: { params: { id: string } }) {
               ))}
           </div>
         </div>
-        <div className="flex-3 text-zinc-300">
-          <div className="flex flex-wrap gap-2">
-            {imdbEpisodes.map((episode, i) => (
-              <Episode key={i} episode={episode} />
-            ))}
+        <div className="flex-3 text-zinc-300 flex flex-col gap-y-10">
+          <div className="flex flex-col gap-y-2">
+            {Object.values(grouped).map((season, i) => {
+              return (
+                <div key={i} className="flex flex-col gap-y-2">
+                  <h2 className="white font-bold text-lg">Season {i + 1}</h2>
+                  <div className="flex flex-wrap gap-2">
+                    {season.map((episode, i) => (
+                      <Episode key={i} episode={episode} />
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
           </div>
-
-          <div>This anime&apos;s series information, discussions, and more detailed information will be displayed here!</div>
+          <div>
+            <h2 className="white font-bold text-lg mb-3">Overview: {result.tagline}</h2>
+            {result.overview}
+          </div>
+          <Discussion id={Number(id)} />
         </div>
       </div>
     </div>

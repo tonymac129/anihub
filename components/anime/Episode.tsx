@@ -25,8 +25,9 @@ function Episode({ episode }: { episode: EpisodeType }) {
       href={"https://imdb.com/title/" + episode.id}
       target="_blank"
       title={episode.title}
-      className={color.bg + " " + color.text + " text-lg w-15 rounded-lg text-center py-1 font-bold"}
+      className={color.bg + " " + color.text + " text-lg w-15 rounded-lg text-right pt-3 px-2 font-bold relative"}
     >
+      <div className="absolute top-0.5 left-0.5 text-xs">E{episode.episodeNumber}</div>
       {rating || "?"}
     </Link>
   );

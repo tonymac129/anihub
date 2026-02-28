@@ -23,6 +23,7 @@ function AnimeCard({ anime, rating }: AnimeCardProps) {
         className="h-38 w-[70%] rounded-lg"
       />
       <h2 className="text-white font-bold text-center">{anime.name.slice(0, 30) + (anime.name.length > 30 ? "..." : "")}</h2>
+      <div className="text-sm">{new Date(anime.first_air_date).getFullYear()}</div>
       <div className="flex items-center gap-x-1 font-bold text-sm">
         <FaStar size={15} />
         <span>{rating.rating}</span>

@@ -13,7 +13,6 @@ function Modal({ children, close }: ModalProps) {
 
   useEffect(() => {
     const clickListener = (e: Event) => {
-      console.log(modalBgRef.current, e.currentTarget);
       if (modalBgRef.current === (e.target as Node)) {
         close();
       }

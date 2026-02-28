@@ -20,6 +20,8 @@ export interface TmdbResponseType {
   vote_count: number;
   status: string;
   created_by: Credit[];
+  tagline?: string;
+  episode_run_time?: number;
 }
 export interface EpisodeType {
   id: string;
@@ -122,4 +124,23 @@ export interface KeywordsType {
 export interface Result {
   name: string;
   id: number;
+}
+
+export interface CommentType {
+  id: string;
+  text: string;
+  animeId: number;
+  user?: UserType;
+  createdAt: Date;
+  userId: string;
+}
+
+export interface UserType {
+  id: string;
+  name: string;
+  email: string;
+  emailVerified: boolean;
+  image?: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
