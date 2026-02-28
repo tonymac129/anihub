@@ -2,11 +2,16 @@ import type { TmdbResponseType, KeywordsType, ImdbResponseType, EpisodeType } fr
 import { tmdbOptions } from "@/lib/tmdb";
 import { notFound } from "next/navigation";
 import { FaGlobe, FaStar } from "react-icons/fa";
+import { addList } from "./actions";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
+import prisma from "@/lib/db";
 import Tag from "@/components/ui/Tag";
 import Link from "next/link";
 import Image from "next/image";
 import Episode from "@/components/anime/Episode";
 import Discussion from "./Discussion";
+import Track from "@/components/anime/Track";
 
 type GroupedType = Record<string, EpisodeType[]>;
 
@@ -43,6 +48,12 @@ async function Page({ params }: { params: { id: string } }) {
     }
     return acc;
   }, {} as GroupedType);
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+  const animeList = await prisma.animeList.findUnique({
+    where: { userId_animeId: { userId: session!.user!.id!, animeId: Number(id) } },
+  });
 
   return (
     <div className="px-50">
@@ -77,6 +88,7 @@ async function Page({ params }: { params: { id: string } }) {
               <span className="text-sm">({imdbData.rating.voteCount})</span>
             </div>
           </div>
+          <Track status={animeList?.status} animeId={Number(id)} addList={addList} />
           <div className="flex flex-col gap-y-1 text-sm">
             <p>Type: TV Series</p>
             <p>Episodes: {result.number_of_episodes}</p>
