@@ -33,7 +33,7 @@ async function Page({ params }: { params: { id: string } }) {
   );
   const imdbEpisodes: EpisodeType[] = [];
   let pageToken = null;
-  for (let i = 0; i < Math.ceil(result.number_of_episodes / 50); i++) {
+  for (let i = 0; i < Math.min(Math.ceil(result.number_of_episodes / 50), 10); i++) {
     const episodeBatch: { episodes: EpisodeType[]; nextPageToken: string } = await fetch(
       `https://api.imdbapi.dev/titles/${externalIDs.imdb_id}/episodes?pageSize=50${pageToken ? "&pageToken=" + pageToken : ""}`,
     ).then((res) => res.json());
@@ -51,9 +51,12 @@ async function Page({ params }: { params: { id: string } }) {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
-  const animeList = await prisma.animeList.findUnique({
-    where: { userId_animeId: { userId: session!.user!.id!, animeId: Number(id) } },
-  });
+  let animeList = null;
+  if (session?.user) {
+    animeList = await prisma.animeList.findUnique({
+      where: { userId_animeId: { userId: session.user.id!, animeId: Number(id) } },
+    });
+  }
 
   return (
     <div className="px-50">
@@ -88,7 +91,7 @@ async function Page({ params }: { params: { id: string } }) {
               <span className="text-sm">({imdbData.rating.voteCount})</span>
             </div>
           </div>
-          <Track status={animeList?.status} animeId={Number(id)} addList={addList} />
+          {session?.user && <Track status={animeList?.status} animeId={Number(id)} addList={addList} />}
           <div className="flex flex-col gap-y-1 text-sm">
             <p>Type: TV Series</p>
             <p>Episodes: {result.number_of_episodes}</p>

@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
+import { editProfile } from "./actions";
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import { FaUserCircle } from "react-icons/fa";
+import { FaUserCircle, FaGlobe } from "react-icons/fa";
 import prisma from "@/lib/db";
 import EditProfile from "./EditProfile";
 import Image from "next/image";
+import Link from "next/link";
 import Followers from "./Followers";
 
 export const metadata: Metadata = {
@@ -22,6 +24,7 @@ async function Page() {
     },
   });
   if (!user) redirect("/signin");
+  const finishedAnime = await prisma.animeList.findMany({ where: { userId: session.user.id } });
 
   return (
     <div className="px-50 flex gap-x-10 py-5">
@@ -38,7 +41,7 @@ async function Page() {
             <Followers name={user.name} count={0} type="following" />
           </div>
         </div>
-        <EditProfile />
+        <EditProfile user={{ name: user.name, about: user.about || "", link: user.link || "" }} editProfile={editProfile} />
         <p>
           Email:{" "}
           <a href={`mailto:${user.email}`} className="hover:underline">
@@ -46,8 +49,35 @@ async function Page() {
           </a>
         </p>
         <p>Joined: {user.createdAt.toLocaleDateString()}</p>
+        {user.link && (
+          <Link
+            href={user.link}
+            target="_blank"
+            className="w-fit text-sm hover:underline text-zinc-300 flex items-center gap-x-2"
+          >
+            <FaGlobe size={20} /> Website
+          </Link>
+        )}
       </div>
-      <div className="flex-3 text-zinc-300"> Your anime lists, collections, and favorties will show up here!</div>
+      <div className="flex-3 text-zinc-300 flex flex-col gap-y-5">
+        <div className="rounded-lg border-2 border-zinc-800 p-5">
+          <h2>Finished watching</h2>
+          <div>
+            {finishedAnime.map((anime) => (
+              <div key={anime.id}>
+                {anime.animeId}
+                {anime.status}
+              </div>
+            ))}
+          </div>
+        </div>
+        {user.about && (
+          <div className="rounded-lg border-2 border-zinc-800 p-5">
+            <h2>{user.name}&apos;s Bio</h2>
+            <div>{user.about}</div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

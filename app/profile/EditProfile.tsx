@@ -1,18 +1,27 @@
 "use client";
 
+import type { ProfileType } from "@/types/User";
 import { AnimatePresence } from "framer-motion";
 import { useState } from "react";
+import { authClient } from "@/lib/auth-client";
 import Button from "@/components/ui/Button";
 import Modal from "@/components/ui/Modal";
 import Input from "@/components/ui/Input";
 
-function EditProfile() {
+type EditProfileProps = {
+  user: ProfileType;
+  editProfile: (userId: string, profile: ProfileType) => Promise<void>;
+};
+
+function EditProfile({ user, editProfile }: EditProfileProps) {
+  const { data: session } = authClient.useSession();
   const [modalOpen, setModalOpen] = useState<boolean>(false);
-  const [name, setName] = useState<string>("");
-  const [bio, setBio] = useState<string>("");
-  const [link, setLink] = useState<string>("");
+  const [name, setName] = useState<string>(user.name);
+  const [bio, setBio] = useState<string>(user.about!);
+  const [link, setLink] = useState<string>(user.link!);
 
   function handleSave() {
+    editProfile(session!.user.id, { name: name, about: bio, link: link });
     setModalOpen(false);
   }
 
