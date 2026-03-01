@@ -6,6 +6,7 @@ import { FaUserCircle } from "react-icons/fa";
 import { MdLogout } from "react-icons/md";
 import { useState, useEffect, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { usePathname } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -15,6 +16,7 @@ function NavUser({ user }: { user: User }) {
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const authClient = createAuthClient();
+  const pathName = usePathname();
 
   useEffect(() => {
     const clickListener = (e: Event) => {
@@ -27,6 +29,10 @@ function NavUser({ user }: { user: User }) {
       document.removeEventListener("click", clickListener);
     };
   }, []);
+
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [pathName]);
 
   async function handleSignOut() {
     await authClient.signOut();
