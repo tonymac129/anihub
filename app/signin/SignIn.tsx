@@ -63,7 +63,7 @@ function SignIn() {
   }
 
   return (
-    <div className="flex flex-col gap-y-5 w-80 m-auto">
+    <div className="flex flex-col gap-y-5 w-80 m-auto pb-20">
       <form className="flex flex-col w-full gap-y-3" onSubmit={handleSubmit}>
         <label className="text-zinc-300 flex flex-col gap-y-1">
           Email

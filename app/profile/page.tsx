@@ -27,8 +27,18 @@ async function Page() {
     },
   });
   if (!user) redirect("/signin");
-  const finishedAnime = await prisma.animeList.findMany({ where: { userId: session.user.id } });
-  const animeResponses: TmdbResponseType[] = await Promise.all(
+  const watchingAnime = await prisma.animeList.findMany({ where: { userId: session.user.id, status: "Watching" } });
+  const watchingResponses: TmdbResponseType[] = await Promise.all(
+    watchingAnime.map(async (anime) => {
+      const result = (await fetch("https://api.themoviedb.org/3/tv/" + anime.animeId, tmdbOptions as RequestInit).then((res) =>
+        res.json(),
+      )) as TmdbResponseType;
+      return result;
+    }),
+  );
+  const watchingRatings = await getRatings(watchingResponses);
+  const finishedAnime = await prisma.animeList.findMany({ where: { userId: session.user.id, status: "Finished" } });
+  const finishedResponses: TmdbResponseType[] = await Promise.all(
     finishedAnime.map(async (anime) => {
       const result = (await fetch("https://api.themoviedb.org/3/tv/" + anime.animeId, tmdbOptions as RequestInit).then((res) =>
         res.json(),
@@ -36,7 +46,17 @@ async function Page() {
       return result;
     }),
   );
-  const ratings = await getRatings(animeResponses);
+  const finishedRatings = await getRatings(finishedResponses);
+  const plannedAnime = await prisma.animeList.findMany({ where: { userId: session.user.id, status: "Planned to watch" } });
+  const plannedResponses: TmdbResponseType[] = await Promise.all(
+    plannedAnime.map(async (anime) => {
+      const result = (await fetch("https://api.themoviedb.org/3/tv/" + anime.animeId, tmdbOptions as RequestInit).then((res) =>
+        res.json(),
+      )) as TmdbResponseType;
+      return result;
+    }),
+  );
+  const plannedRatings = await getRatings(plannedResponses);
 
   return (
     <div className="px-50 flex gap-x-10 py-5 pb-10">
@@ -81,25 +101,37 @@ async function Page() {
         <div className="flex flex-col gap-y-5">
           <h2 className="white font-bold text-lg">Currently watching</h2>
           <div className="flex flex-wrap gap-5">
-            {animeResponses.map((anime, i) => (
-              <AnimeCard key={anime.id} anime={anime} rating={ratings[i]} small />
-            ))}
+            {watchingResponses.length > 0 ? (
+              watchingResponses.map((anime, i) => <AnimeCard key={anime.id} anime={anime} rating={watchingRatings[i]} small />)
+            ) : (
+              <div className="text-zinc-400 text-sm">
+                You aren&apos;t currently watching any anime series. Click on the top or browse tab to find one and enjoy!
+              </div>
+            )}
           </div>
         </div>
         <div className="flex flex-col gap-y-5">
           <h2 className="white font-bold text-lg">Finished watching</h2>
           <div className="flex flex-wrap gap-5">
-            {animeResponses.map((anime, i) => (
-              <AnimeCard key={anime.id} anime={anime} rating={ratings[i]} small />
-            ))}
+            {finishedResponses.length > 0 ? (
+              finishedResponses.map((anime, i) => <AnimeCard key={anime.id} anime={anime} rating={finishedRatings[i]} small />)
+            ) : (
+              <div className="text-zinc-400 text-sm">
+                You haven&apos;t finished watching any anime series (yet). Click on the top or browse tab to find one and track!
+              </div>
+            )}
           </div>
         </div>
         <div className="flex flex-col gap-y-5">
           <h2 className="white font-bold text-lg">Planned to watch</h2>
           <div className="flex flex-wrap gap-5">
-            {animeResponses.map((anime, i) => (
-              <AnimeCard key={anime.id} anime={anime} rating={ratings[i]} small />
-            ))}
+            {plannedResponses.length > 0 ? (
+              plannedResponses.map((anime, i) => <AnimeCard key={anime.id} anime={anime} rating={plannedRatings[i]} small />)
+            ) : (
+              <div className="text-zinc-400 text-sm">
+                You aren&apos;t planning to watch any anime series. Click on the top or browse tab to find one you like!
+              </div>
+            )}
           </div>
         </div>
       </div>

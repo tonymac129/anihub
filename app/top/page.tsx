@@ -1,0 +1,27 @@
+import type { TmdbResponseType } from "@/types/Anime";
+import { tmdbOptions, getRatings } from "@/lib/tmdb";
+import Hero from "@/components/layout/Hero";
+import Place from "./Place";
+
+async function Page() {
+  const results = await fetch("https://api.themoviedb.org/3/discover/tv?with_keywords=210024", tmdbOptions as RequestInit).then(
+    (res) => res.json(),
+  );
+  const popularAnime: TmdbResponseType[] = results.results
+    .filter((result: TmdbResponseType) => result.vote_count > 100)
+    .slice(0, 10);
+  const ratings = await getRatings(popularAnime);
+
+  return (
+    <div>
+      <Hero title="Top Animes" description="Browse the top 10 anime series of all time, ranked by their IMDb ratings." />
+      <div className="flex flex-col gap-y-5 pb-30 items-center">
+        {popularAnime.map((anime, i) => (
+          <Place key={anime.id} index={i} anime={anime} rating={ratings[i]} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export default Page;
