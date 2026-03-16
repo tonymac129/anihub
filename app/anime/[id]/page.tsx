@@ -2,7 +2,7 @@ import type { TmdbResponseType, KeywordsType, ImdbResponseType, EpisodeType } fr
 import { tmdbOptions } from "@/lib/tmdb";
 import { notFound } from "next/navigation";
 import { FaGlobe, FaStar } from "react-icons/fa";
-import { addList } from "./actions";
+import { addList, addFavorite } from "./actions";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import prisma from "@/lib/db";
@@ -12,11 +12,25 @@ import Image from "next/image";
 import Episode from "@/components/anime/Episode";
 import Discussion from "./Discussion";
 import Track from "@/components/anime/Track";
+import Favorite from "@/components/anime/Favorite";
+import People from "@/components/anime/People";
 
 type GroupedType = Record<string, EpisodeType[]>;
 
-async function Page({ params }: { params: { id: string } }) {
+const tabStyles = "rounded-lg px-2 py-1 font-bold cursor-pointer hover:bg-zinc-900 relative ";
+const currentTabStyles =
+  "after:content-[''] after:absolute after:w-full after:h-0.5 after:bg-zinc-200 after:-bottom-1.5 after:left-0";
+
+type PageProps = {
+  params: { id: string };
+  searchParams: Promise<{ tab: string }>;
+};
+
+async function Page({ params, searchParams }: PageProps) {
   const { id } = await params;
+  const { tab } = await searchParams;
+  console.log(tab);
+
   const result = (await fetch("https://api.themoviedb.org/3/tv/" + id, tmdbOptions as RequestInit).then((res) =>
     res.json(),
   )) as TmdbResponseType;
@@ -52,10 +66,15 @@ async function Page({ params }: { params: { id: string } }) {
     headers: await headers(),
   });
   let animeList = null;
+  let favorited: boolean = false;
   if (session?.user) {
     animeList = await prisma.animeList.findUnique({
       where: { userId_animeId: { userId: session.user.id!, animeId: Number(id) } },
     });
+    const favorite = await prisma.favorites.findUnique({
+      where: { userId_animeId: { userId: session.user.id!, animeId: Number(id) } },
+    });
+    favorited = favorite ? true : false;
   }
 
   return (
@@ -91,7 +110,12 @@ async function Page({ params }: { params: { id: string } }) {
               <span className="text-sm">({imdbData.rating.voteCount})</span>
             </div>
           </div>
-          {session?.user && <Track status={animeList?.status} animeId={Number(id)} addList={addList} />}
+          {session?.user && (
+            <div className="flex gap-x-3">
+              <Track status={animeList?.status} animeId={Number(id)} addList={addList} />
+              <Favorite animeId={Number(id)} favoritedBefore={favorited} addFavorite={addFavorite} />
+            </div>
+          )}
           <div className="flex flex-col gap-y-1 text-sm">
             <p>Type: TV Series</p>
             <p>Episodes: {result.number_of_episodes}</p>
@@ -135,26 +159,47 @@ async function Page({ params }: { params: { id: string } }) {
               ))}
           </div>
         </div>
-        <div className="flex-3 text-zinc-300 flex flex-col gap-y-10">
-          <div className="flex flex-col gap-y-2">
-            {Object.values(grouped).map((season, i) => {
-              return (
-                <div key={i} className="flex flex-col gap-y-2">
-                  <h2 className="white font-bold text-lg">Season {i + 1}</h2>
-                  <div className="flex flex-wrap gap-2">
-                    {season.map((episode, i) => (
-                      <Episode key={i} episode={episode} />
-                    ))}
-                  </div>
-                </div>
-              );
-            })}
+        <div className="flex-3 text-zinc-300">
+          <div className="border-b-2 border-zinc-800 flex gap-x-3 pb-1 mb-5">
+            <Link href={"/anime/" + id} className={tabStyles + (!tab ? currentTabStyles : "")}>
+              Overview
+            </Link>
+            <Link href={`/anime/${id}?tab=episodes`} className={tabStyles + (tab === "episodes" ? currentTabStyles : "")}>
+              Episodes
+            </Link>
+            <Link href={`/anime/${id}?tab=discussion`} className={tabStyles + (tab === "discussion" ? currentTabStyles : "")}>
+              Discussion
+            </Link>
+            <Link href={`/anime/${id}?tab=people`} className={tabStyles + (tab === "people" ? currentTabStyles : "")}>
+              People
+            </Link>
           </div>
-          <div>
-            <h2 className="white font-bold text-lg mb-3">Overview: {result.tagline}</h2>
-            {result.overview}
+          <div className="flex-3 text-zinc-300 flex flex-col gap-y-10">
+            {(!tab || tab === "episodes") && (
+              <div className="flex flex-col gap-y-2">
+                {Object.values(grouped).map((season, i) => {
+                  return (
+                    <div key={i} className="flex flex-col gap-y-2">
+                      <h2 className="white font-bold text-lg">Season {i + 1}</h2>
+                      <div className="flex flex-wrap gap-2">
+                        {season.map((episode, i) => (
+                          <Episode key={i} episode={episode} />
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+            {!tab && (
+              <div>
+                <h2 className="white font-bold text-lg mb-3">&quot;{result.tagline}&quot;</h2>
+                {result.overview}
+              </div>
+            )}
+            {(!tab || tab === "discussion") && <Discussion id={Number(id)} full={tab ? true : false} />}
+            {tab === "people" && <People id={Number(id)} />}
           </div>
-          <Discussion id={Number(id)} />
         </div>
       </div>
     </div>

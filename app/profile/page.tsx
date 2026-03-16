@@ -27,6 +27,16 @@ async function Page() {
     },
   });
   if (!user) redirect("/signin");
+  const favoriteAnime = await prisma.favorites.findMany({ where: { userId: session.user.id } });
+  const favoriteResponses: TmdbResponseType[] = await Promise.all(
+    favoriteAnime.map(async (anime) => {
+      const result = (await fetch("https://api.themoviedb.org/3/tv/" + anime.animeId, tmdbOptions as RequestInit).then((res) =>
+        res.json(),
+      )) as TmdbResponseType;
+      return result;
+    }),
+  );
+  const favoriteRatings = await getRatings(favoriteResponses);
   const watchingAnime = await prisma.animeList.findMany({ where: { userId: session.user.id, status: "Watching" } });
   const watchingResponses: TmdbResponseType[] = await Promise.all(
     watchingAnime.map(async (anime) => {
@@ -92,14 +102,32 @@ async function Page() {
         )}
       </div>
       <div className="flex-3 text-zinc-300 flex flex-col gap-y-10">
-        {user.about && (
-          <div className="flex flex-col gap-y-5">
-            <h2 className="white font-bold text-lg">{user.name}&apos;s Bio</h2>
-            <div>{user.about}</div>
-          </div>
-        )}
         <div className="flex flex-col gap-y-5">
-          <h2 className="white font-bold text-lg">Currently watching</h2>
+          <h2 className="white font-bold text-lg">{user.name}&apos;s Bio</h2>
+          {user.about ? (
+            <div>{user.about}</div>
+          ) : (
+            <div className="text-zinc-400 text-sm">
+              You haven&apos;t added a bio about yourself (yet). Click on edit profile to add it and customize your profile!
+            </div>
+          )}
+        </div>
+        <div className="flex flex-col gap-y-5">
+          <h2 className="white font-bold text-lg">
+            {user.name}&apos;s favorites ({favoriteResponses.length})
+          </h2>
+          <div className="flex flex-wrap gap-5">
+            {favoriteResponses.length > 0 ? (
+              favoriteResponses.map((anime, i) => <AnimeCard key={anime.id} anime={anime} rating={favoriteRatings[i]} small />)
+            ) : (
+              <div className="text-zinc-400 text-sm">
+                Show what you love to the rest of the world by clicking on the heart icon on the anime page!
+              </div>
+            )}
+          </div>
+        </div>
+        <div className="flex flex-col gap-y-5">
+          <h2 className="white font-bold text-lg">Currently watching ({watchingResponses.length})</h2>
           <div className="flex flex-wrap gap-5">
             {watchingResponses.length > 0 ? (
               watchingResponses.map((anime, i) => <AnimeCard key={anime.id} anime={anime} rating={watchingRatings[i]} small />)
@@ -111,7 +139,7 @@ async function Page() {
           </div>
         </div>
         <div className="flex flex-col gap-y-5">
-          <h2 className="white font-bold text-lg">Finished watching</h2>
+          <h2 className="white font-bold text-lg">Finished watching ({finishedResponses.length})</h2>
           <div className="flex flex-wrap gap-5">
             {finishedResponses.length > 0 ? (
               finishedResponses.map((anime, i) => <AnimeCard key={anime.id} anime={anime} rating={finishedRatings[i]} small />)
@@ -123,7 +151,7 @@ async function Page() {
           </div>
         </div>
         <div className="flex flex-col gap-y-5">
-          <h2 className="white font-bold text-lg">Planned to watch</h2>
+          <h2 className="white font-bold text-lg">Planned to watch ({plannedResponses.length})</h2>
           <div className="flex flex-wrap gap-5">
             {plannedResponses.length > 0 ? (
               plannedResponses.map((anime, i) => <AnimeCard key={anime.id} anime={anime} rating={plannedRatings[i]} small />)

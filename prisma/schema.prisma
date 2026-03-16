@@ -27,6 +27,7 @@ model User {
   accounts      Account[]
   comments      Comment[]
   animeLists    AnimeList[]
+  favorites     Favorites[]
 
   @@map("user")
 }
@@ -93,6 +94,7 @@ model Anime {
   id         Int         @id
   comments   Comment[]
   animeLists AnimeList[]
+  favorites  Favorites[]
 }
 
 model AnimeList {
@@ -102,6 +104,16 @@ model AnimeList {
   animeId Int
   anime   Anime  @relation(fields: [animeId], references: [id], onDelete: Cascade)
   status  String
+
+  @@unique([userId, animeId])
+}
+
+model Favorites {
+  id      String @id @default(uuid())
+  userId  String
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  animeId Int
+  anime   Anime  @relation(fields: [animeId], references: [id], onDelete: Cascade)
 
   @@unique([userId, animeId])
 }

@@ -34,7 +34,7 @@ function Track({ status, animeId, addList }: TrackProps) {
   }
 
   return (
-    <div ref={listMenuRef} className="flex flex-col relative">
+    <div ref={listMenuRef} className="flex flex-col relative flex-1">
       <Button text={status || "Add to list"} onclick={() => setOpen(!open)} primary={status ? false : true} />
       <AnimatePresence>
         {open && (

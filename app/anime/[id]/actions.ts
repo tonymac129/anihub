@@ -59,3 +59,23 @@ export async function addList(animeId: number, status: string) {
     console.error("Error: " + err);
   }
 }
+
+export async function addFavorite(animeId: number, favoriting: boolean) {
+  try {
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+    if (favoriting) {
+      await prisma.favorites.create({
+        data: {
+          animeId: animeId,
+          userId: session!.user!.id,
+        },
+      });
+    } else {
+      await prisma.favorites.delete({ where: { userId_animeId: { userId: session!.user!.id!, animeId: animeId } } });
+    }
+  } catch (err) {
+    console.error("Error: " + err);
+  }
+}
