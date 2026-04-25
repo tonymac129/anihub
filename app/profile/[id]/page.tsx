@@ -1,37 +1,30 @@
-import type { Metadata } from "next";
 import type { TmdbResponseType } from "@/types/Anime";
-import { editProfile } from "./actions";
-import { headers } from "next/headers";
-import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { FaUserCircle, FaGlobe } from "react-icons/fa";
 import { getRatings, tmdbOptions } from "@/lib/tmdb";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
+import { followUser } from "./actions";
 import prisma from "@/lib/db";
-import EditProfile from "./EditProfile";
+import AnimeCard from "@/components/ui/AnimeCard";
+import Followers from "../Followers";
 import Image from "next/image";
 import Link from "next/link";
-import Followers from "./Followers";
-import AnimeCard from "@/components/ui/AnimeCard";
-import Button from "@/components/ui/Button";
+import Follow from "./Follow";
 
-export const metadata: Metadata = {
-  title: "My Profile | AniHub",
-  description:
-    "View your anime lists, showcase your favorites, and customize your own profile on AniHub!",
-};
-
-async function Page() {
-  const session = await auth.api.getSession({ headers: await headers() });
-  if (!session) redirect("/signin");
+async function Page({ params }: { params: Promise<{ id: string }> }) {
+  const { id: userID } = await params;
   const user = await prisma.user.findUnique({
-    where: {
-      email: session.user.email,
-    },
+    where: { id: userID },
     include: { followers: true, following: true },
   });
-  if (!user) redirect("/signin");
+  if (!user) redirect("/profile");
+  const session = await auth.api.getSession({ headers: await headers() });
+  const following = await prisma.user.count({
+    where: { id: session?.user.id, following: { some: { id: userID } } },
+  });
   const favoriteAnime = await prisma.favorites.findMany({
-    where: { userId: session.user.id },
+    where: { userId: user.id },
   });
   const favoriteResponses: TmdbResponseType[] = await Promise.all(
     favoriteAnime.map(async (anime) => {
@@ -44,7 +37,7 @@ async function Page() {
   );
   const favoriteRatings = await getRatings(favoriteResponses);
   const watchingAnime = await prisma.animeList.findMany({
-    where: { userId: session.user.id, status: "Watching" },
+    where: { userId: user.id, status: "Watching" },
   });
   const watchingResponses: TmdbResponseType[] = await Promise.all(
     watchingAnime.map(async (anime) => {
@@ -57,7 +50,7 @@ async function Page() {
   );
   const watchingRatings = await getRatings(watchingResponses);
   const finishedAnime = await prisma.animeList.findMany({
-    where: { userId: session.user.id, status: "Finished" },
+    where: { userId: user.id, status: "Finished" },
   });
   const finishedResponses: TmdbResponseType[] = await Promise.all(
     finishedAnime.map(async (anime) => {
@@ -70,7 +63,7 @@ async function Page() {
   );
   const finishedRatings = await getRatings(finishedResponses);
   const plannedAnime = await prisma.animeList.findMany({
-    where: { userId: session.user.id, status: "Planned to watch" },
+    where: { userId: user.id, status: "Planned to watch" },
   });
   const plannedResponses: TmdbResponseType[] = await Promise.all(
     plannedAnime.map(async (anime) => {
@@ -115,18 +108,13 @@ async function Page() {
             />
           </div>
         </div>
-        <EditProfile
-          user={{
-            name: user.name,
-            about: user.about || "",
-            link: user.link || "",
-          }}
-          editProfile={editProfile}
-        />
-        <Button
-          text="View public profile"
-          link={"/profile/" + session.user.id}
-        />
+        {session?.user.id !== user.id && (
+          <Follow
+            isFollowing={following ? true : false}
+            userID={userID}
+            followUser={followUser}
+          />
+        )}
         <p>
           Email:{" "}
           <a href={`mailto:${user.email}`} className="hover:underline">
@@ -151,8 +139,7 @@ async function Page() {
             <div>{user.about}</div>
           ) : (
             <div className="text-zinc-400 text-sm">
-              You haven&apos;t added a bio about yourself (yet). Click on edit
-              profile to add it and customize your profile!
+              {user.name} has&apos;t updated their bio yet.
             </div>
           )}
         </div>
@@ -172,8 +159,7 @@ async function Page() {
               ))
             ) : (
               <div className="text-zinc-400 text-sm">
-                Show what you love to the rest of the world by clicking on the
-                heart icon on the anime page!
+                {user.name} doesn&apos;t have any favorites yet.
               </div>
             )}
           </div>
@@ -194,8 +180,7 @@ async function Page() {
               ))
             ) : (
               <div className="text-zinc-400 text-sm">
-                You aren&apos;t currently watching any anime series. Click on
-                the top or browse tab to find one and enjoy!
+                {user.name} isn&apos;t currently watching anything.
               </div>
             )}
           </div>
@@ -216,8 +201,8 @@ async function Page() {
               ))
             ) : (
               <div className="text-zinc-400 text-sm">
-                You haven&apos;t finished watching any anime series (yet). Click
-                on the top or browse tab to find one and track!
+                {" "}
+                {user.name} hasn&apos;t finished watching anything yet.
               </div>
             )}
           </div>
@@ -238,8 +223,8 @@ async function Page() {
               ))
             ) : (
               <div className="text-zinc-400 text-sm">
-                You aren&apos;t planning to watch any anime series. Click on the
-                top or browse tab to find one you like!
+                {" "}
+                {user.name} isn&apos;t planning to watch anything.
               </div>
             )}
           </div>

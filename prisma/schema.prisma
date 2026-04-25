@@ -28,6 +28,9 @@ model User {
   comments      Comment[]
   animeLists    AnimeList[]
   favorites     Favorites[]
+  userId        String?
+  followers     User[]      @relation("Follows")
+  following     User[]      @relation("Follows")
 
   @@map("user")
 }
