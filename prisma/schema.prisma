@@ -31,6 +31,7 @@ model User {
   userId        String?
   followers     User[]      @relation("Follows")
   following     User[]      @relation("Follows")
+  likedComments Comment[]   @relation("UserLikes")
 
   @@map("user")
 }
@@ -91,6 +92,8 @@ model Comment {
   createdAt DateTime @default(now())
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  rating    Int?
+  likedBy   User[]   @relation("UserLikes")
 }
 
 model Anime {

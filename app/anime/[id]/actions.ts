@@ -11,7 +11,9 @@ export async function addComment(animeId: number, comment: CommentType) {
     const session = await auth.api.getSession({
       headers: await headers(),
     });
-    const existingAnime = await prisma.anime.findUnique({ where: { id: animeId } });
+    const existingAnime = await prisma.anime.findUnique({
+      where: { id: animeId },
+    });
     if (!existingAnime) {
       await prisma.anime.create({ data: { id: animeId } });
     }
@@ -20,6 +22,7 @@ export async function addComment(animeId: number, comment: CommentType) {
         text: comment.text,
         animeId: comment.animeId,
         userId: session!.user!.id!,
+        rating: comment.rating,
       },
     });
     revalidatePath("/anima/" + animeId);
@@ -34,14 +37,22 @@ export async function addList(animeId: number, status: string) {
       headers: await headers(),
     });
     if (status === "remove") {
-      await prisma.animeList.delete({ where: { userId_animeId: { userId: session!.user!.id!, animeId: animeId } } });
+      await prisma.animeList.delete({
+        where: {
+          userId_animeId: { userId: session!.user!.id!, animeId: animeId },
+        },
+      });
     } else {
       const existingAnimeList = await prisma.animeList.findUnique({
-        where: { userId_animeId: { userId: session!.user!.id!, animeId: animeId } },
+        where: {
+          userId_animeId: { userId: session!.user!.id!, animeId: animeId },
+        },
       });
       if (existingAnimeList) {
         await prisma.animeList.update({
-          where: { userId_animeId: { userId: session!.user!.id!, animeId: animeId } },
+          where: {
+            userId_animeId: { userId: session!.user!.id!, animeId: animeId },
+          },
           data: { status: status },
         });
       } else {
@@ -73,7 +84,11 @@ export async function addFavorite(animeId: number, favoriting: boolean) {
         },
       });
     } else {
-      await prisma.favorites.delete({ where: { userId_animeId: { userId: session!.user!.id!, animeId: animeId } } });
+      await prisma.favorites.delete({
+        where: {
+          userId_animeId: { userId: session!.user!.id!, animeId: animeId },
+        },
+      });
     }
   } catch (err) {
     console.error("Error: " + err);
