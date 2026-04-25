@@ -24,7 +24,6 @@ function CommentField({
     createdAt: new Date(),
     userId: name,
     text: "",
-    likes: 0,
   });
 
   function handleAddComment() {

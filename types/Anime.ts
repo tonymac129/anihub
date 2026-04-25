@@ -134,7 +134,6 @@ export interface CommentType {
   createdAt: Date;
   userId: string;
   rating?: number;
-  likes: number;
 }
 
 export interface UserType {
