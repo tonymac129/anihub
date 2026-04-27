@@ -21,10 +21,17 @@ async function Nav() {
         <Link href="/new" className={navLinkStyles}>
           New
         </Link>
-        <Link href="/browse" className={navLinkStyles}>
-          Browse
+        <Link href="/explore" className={navLinkStyles}>
+          Explore
         </Link>
-        {session ? <NavUser user={session.user} /> : <Button text="Sign in" link="/signin" primary />}
+        <Link href="/about" className={navLinkStyles}>
+          About
+        </Link>
+        {session ? (
+          <NavUser user={session.user} />
+        ) : (
+          <Button text="Sign in" link="/signin" primary />
+        )}
       </div>
     </div>
   );

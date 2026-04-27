@@ -18,6 +18,21 @@ export const metadata: Metadata = {
   title: "My Profile | AniHub",
   description:
     "View your anime lists, showcase your favorites, and customize your own profile on AniHub!",
+  openGraph: {
+    title: "My Profile | AniHub",
+    description:
+      "View your anime lists, showcase your favorites, and customize your own profile on AniHub!",
+    url: `https://anihub-app.vercel.app/profile`,
+    siteName: "AniHub",
+    images: [
+      {
+        url: "/logo.png",
+        width: 50,
+        height: 50,
+      },
+    ],
+    type: "website",
+  },
 };
 
 async function Page() {
@@ -195,7 +210,7 @@ async function Page() {
             ) : (
               <div className="text-zinc-400 text-sm">
                 You aren&apos;t currently watching any anime series. Click on
-                the top or browse tab to find one and enjoy!
+                the top or explore tab to find one and enjoy!
               </div>
             )}
           </div>
@@ -217,7 +232,7 @@ async function Page() {
             ) : (
               <div className="text-zinc-400 text-sm">
                 You haven&apos;t finished watching any anime series (yet). Click
-                on the top or browse tab to find one and track!
+                on the top or explore tab to find one and track!
               </div>
             )}
           </div>
@@ -239,7 +254,7 @@ async function Page() {
             ) : (
               <div className="text-zinc-400 text-sm">
                 You aren&apos;t planning to watch any anime series. Click on the
-                top or browse tab to find one you like!
+                top or explore tab to find one you like!
               </div>
             )}
           </div>

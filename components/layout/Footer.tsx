@@ -15,12 +15,20 @@ function Footer() {
       <div className="flex gap-x-3">
         <div className="w-40 text-right">
           Made by{" "}
-          <a href="https://github.com/tonymac129" target="_blank" className="text-left hover:underline">
+          <a
+            href="https://github.com/tonymac129"
+            target="_blank"
+            className="text-left hover:underline"
+          >
             TonyMac129
           </a>
         </div>
         •
-        <a href="https://github.com/tonymac129/anihub" target="_blank" className="w-40 text-left hover:underline">
+        <a
+          href="https://github.com/tonymac129/anihub"
+          target="_blank"
+          className="w-40 text-left hover:underline"
+        >
           GitHub source code
         </a>
       </div>
@@ -37,8 +45,12 @@ function Footer() {
           New
         </Link>
         •
-        <Link href="/browse" className="hover:underline w-10 text-center">
-          Browse
+        <Link href="/explore" className="hover:underline w-13 text-center">
+          Explore
+        </Link>
+        •
+        <Link href="/about" className="hover:underline w-10 text-center">
+          About
         </Link>
       </div>
     </div>

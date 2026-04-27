@@ -90,6 +90,7 @@ export async function addFavorite(animeId: number, favoriting: boolean) {
         },
       });
     }
+    revalidatePath("/anime/" + animeId);
   } catch (err) {
     console.error("Error: " + err);
   }

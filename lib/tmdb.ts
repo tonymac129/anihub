@@ -1,4 +1,8 @@
-import type { RatingType, TmdbResponseType, ImdbResponseType } from "@/types/Anime";
+import type {
+  RatingType,
+  TmdbResponseType,
+  ImdbResponseType,
+} from "@/types/Anime";
 
 export const tmdbOptions = {
   method: "GET",
@@ -8,7 +12,9 @@ export const tmdbOptions = {
   },
 };
 
-export async function getRatings(animes: TmdbResponseType[]): Promise<RatingType[]> {
+export async function getRatings(
+  animes: TmdbResponseType[],
+): Promise<RatingType[]> {
   const allIDs = await Promise.all(
     animes.map(async (anime) => {
       const externalIDs = await fetch(
@@ -33,12 +39,14 @@ export async function getRatings(animes: TmdbResponseType[]): Promise<RatingType
     const imdbData = await fetch(endpoint).then((res) => res.json());
     const imdbTitles: ImdbResponseType[] = imdbData.titles;
     const sortedTitles = [];
-    console.log(endpoint);
     for (const title of imdbTitles) {
       sortedTitles[batch.indexOf(title.id)!] = title;
     }
     for (const title of sortedTitles) {
-      ratings.push({ rating: title.rating.aggregateRating, count: title.rating.voteCount });
+      ratings.push({
+        rating: title.rating.aggregateRating,
+        count: title.rating.voteCount,
+      });
     }
   }
   return ratings;

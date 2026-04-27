@@ -1,4 +1,10 @@
-import type { TmdbResponseType, KeywordsType, ImdbResponseType, EpisodeType } from "@/types/Anime";
+import type { Metadata } from "next";
+import type {
+  TmdbResponseType,
+  KeywordsType,
+  ImdbResponseType,
+  EpisodeType,
+} from "@/types/Anime";
 import { tmdbOptions } from "@/lib/tmdb";
 import { notFound } from "next/navigation";
 import { FaGlobe, FaStar } from "react-icons/fa";
@@ -17,7 +23,8 @@ import People from "@/components/anime/People";
 
 type GroupedType = Record<string, EpisodeType[]>;
 
-const tabStyles = "rounded-lg px-2 py-1 font-bold cursor-pointer hover:bg-zinc-900 relative ";
+const tabStyles =
+  "rounded-lg px-2 py-1 font-bold cursor-pointer hover:bg-zinc-900 relative ";
 const currentTabStyles =
   "after:content-[''] after:absolute after:w-full after:h-0.5 after:bg-zinc-200 after:-bottom-1.5 after:left-0";
 
@@ -26,31 +33,59 @@ type PageProps = {
   searchParams: Promise<{ tab: string }>;
 };
 
+export const metadata: Metadata = {
+  title: "Anime Series | AniHub",
+  description:
+    "Check out this anime series' page on AniHub, with its detailed information, related images, user comments, discussions, episode ratings, and people currently watching it!",
+  openGraph: {
+    title: "Anime Series | AniHub",
+    description:
+      "Check out this anime series' page on AniHub, with its detailed information, related images, user comments, discussions, episode ratings, and people currently watching it!",
+    url: `https://anihub-app.vercel.app/expore`,
+    siteName: "AniHub",
+    images: [
+      {
+        url: "/logo.png",
+        width: 50,
+        height: 50,
+      },
+    ],
+    type: "website",
+  },
+};
+
 async function Page({ params, searchParams }: PageProps) {
   const { id } = await params;
   const { tab } = await searchParams;
-  console.log(tab);
 
-  const result = (await fetch("https://api.themoviedb.org/3/tv/" + id, tmdbOptions as RequestInit).then((res) =>
-    res.json(),
-  )) as TmdbResponseType;
+  const result = (await fetch(
+    "https://api.themoviedb.org/3/tv/" + id,
+    tmdbOptions as RequestInit,
+  ).then((res) => res.json())) as TmdbResponseType;
   if ("success" in result && result.success === false) notFound();
-  const keywords: KeywordsType = await fetch(`https://api.themoviedb.org/3/tv/${id}/keywords`, tmdbOptions as RequestInit).then(
-    (res) => res.json(),
-  );
+  const keywords: KeywordsType = await fetch(
+    `https://api.themoviedb.org/3/tv/${id}/keywords`,
+    tmdbOptions as RequestInit,
+  ).then((res) => res.json());
   if (!keywords.results.find((result) => result.id === 210024)) notFound();
-  const externalIDs = await fetch(`https://api.themoviedb.org/3/tv/${id}/external_ids`, tmdbOptions as RequestInit).then((res) =>
-    res.json(),
-  );
-  const imdbData: ImdbResponseType = await fetch("https://api.imdbapi.dev/titles/" + externalIDs.imdb_id).then((res) =>
-    res.json(),
-  );
+  const externalIDs = await fetch(
+    `https://api.themoviedb.org/3/tv/${id}/external_ids`,
+    tmdbOptions as RequestInit,
+  ).then((res) => res.json());
+  const imdbData: ImdbResponseType = await fetch(
+    "https://api.imdbapi.dev/titles/" + externalIDs.imdb_id,
+  ).then((res) => res.json());
   const imdbEpisodes: EpisodeType[] = [];
   let pageToken = null;
-  for (let i = 0; i < Math.min(Math.ceil(result.number_of_episodes / 50), 10); i++) {
-    const episodeBatch: { episodes: EpisodeType[]; nextPageToken: string } = await fetch(
-      `https://api.imdbapi.dev/titles/${externalIDs.imdb_id}/episodes?pageSize=50${pageToken ? "&pageToken=" + pageToken : ""}`,
-    ).then((res) => res.json());
+  for (
+    let i = 0;
+    i < Math.min(Math.ceil(result.number_of_episodes / 50), 10);
+    i++
+  ) {
+    const episodeBatch: { episodes: EpisodeType[]; nextPageToken: string } =
+      await fetch(
+        `https://api.imdbapi.dev/titles/${externalIDs.imdb_id}/episodes?pageSize=50${pageToken ? "&pageToken=" + pageToken : ""}`,
+      ).then((res) => res.json());
     imdbEpisodes.push(...episodeBatch.episodes);
     if (episodeBatch.nextPageToken) pageToken = episodeBatch.nextPageToken;
   }
@@ -69,10 +104,14 @@ async function Page({ params, searchParams }: PageProps) {
   let favorited: boolean = false;
   if (session?.user) {
     animeList = await prisma.animeList.findUnique({
-      where: { userId_animeId: { userId: session.user.id!, animeId: Number(id) } },
+      where: {
+        userId_animeId: { userId: session.user.id!, animeId: Number(id) },
+      },
     });
     const favorite = await prisma.favorites.findUnique({
-      where: { userId_animeId: { userId: session.user.id!, animeId: Number(id) } },
+      where: {
+        userId_animeId: { userId: session.user.id!, animeId: Number(id) },
+      },
     });
     favorited = favorite ? true : false;
   }
@@ -102,18 +141,30 @@ async function Page({ params, searchParams }: PageProps) {
             <h4 className="text-sm">{result.original_name}</h4>
             <h4 className="text-sm">
               {new Date(result.first_air_date).getFullYear()} —{" "}
-              {result.status === "Ended" ? new Date(result.last_air_date).getFullYear() : "Now"}
+              {result.status === "Ended"
+                ? new Date(result.last_air_date).getFullYear()
+                : "Now"}
             </h4>
             <div className="flex gap-x-2 items-center">
               <FaStar size={20} />
-              <span className="text-lg font-bold">{imdbData.rating.aggregateRating}</span>
+              <span className="text-lg font-bold">
+                {imdbData.rating.aggregateRating}
+              </span>
               <span className="text-sm">({imdbData.rating.voteCount})</span>
             </div>
           </div>
           {session?.user && (
             <div className="flex gap-x-3">
-              <Track status={animeList?.status} animeId={Number(id)} addList={addList} />
-              <Favorite animeId={Number(id)} favoritedBefore={favorited} addFavorite={addFavorite} />
+              <Track
+                status={animeList?.status}
+                animeId={Number(id)}
+                addList={addList}
+              />
+              <Favorite
+                animeId={Number(id)}
+                favoritedBefore={favorited}
+                addFavorite={addFavorite}
+              />
             </div>
           )}
           <div className="flex flex-col gap-y-1 text-sm">
@@ -121,8 +172,13 @@ async function Page({ params, searchParams }: PageProps) {
             <p>Episodes: {result.number_of_episodes}</p>
             <p>Status: {result.status}</p>
             <p>Episode length: {result.episode_run_time}m</p>
-            <p>First aired: {new Date(result.first_air_date).toLocaleDateString()}</p>
-            <p>Last aired: {new Date(result.last_air_date).toLocaleDateString()}</p>
+            <p>
+              First aired:{" "}
+              {new Date(result.first_air_date).toLocaleDateString()}
+            </p>
+            <p>
+              Last aired: {new Date(result.last_air_date).toLocaleDateString()}
+            </p>
             {result.created_by.length > 0 && (
               <p>
                 Created by:{" "}
@@ -143,7 +199,10 @@ async function Page({ params, searchParams }: PageProps) {
             <FaGlobe size={20} /> Official website
           </Link>
           <Image
-            src={"https://image.tmdb.org/t/p/w300/" + result.production_companies![0].logo_path}
+            src={
+              "https://image.tmdb.org/t/p/w300/" +
+              result.production_companies![0].logo_path
+            }
             alt={result.production_companies![0].name + " Logo"}
             title={result.production_companies![0].name}
             width={100}
@@ -161,16 +220,32 @@ async function Page({ params, searchParams }: PageProps) {
         </div>
         <div className="flex-3 text-zinc-300">
           <div className="border-b-2 border-zinc-800 flex gap-x-3 pb-1 mb-5">
-            <Link href={"/anime/" + id} className={tabStyles + (!tab ? currentTabStyles : "")}>
+            <Link
+              href={"/anime/" + id}
+              className={tabStyles + (!tab ? currentTabStyles : "")}
+            >
               Overview
             </Link>
-            <Link href={`/anime/${id}?tab=episodes`} className={tabStyles + (tab === "episodes" ? currentTabStyles : "")}>
+            <Link
+              href={`/anime/${id}?tab=episodes`}
+              className={
+                tabStyles + (tab === "episodes" ? currentTabStyles : "")
+              }
+            >
               Episodes
             </Link>
-            <Link href={`/anime/${id}?tab=discussion`} className={tabStyles + (tab === "discussion" ? currentTabStyles : "")}>
+            <Link
+              href={`/anime/${id}?tab=discussion`}
+              className={
+                tabStyles + (tab === "discussion" ? currentTabStyles : "")
+              }
+            >
               Discussion
             </Link>
-            <Link href={`/anime/${id}?tab=people`} className={tabStyles + (tab === "people" ? currentTabStyles : "")}>
+            <Link
+              href={`/anime/${id}?tab=people`}
+              className={tabStyles + (tab === "people" ? currentTabStyles : "")}
+            >
               People
             </Link>
           </div>
@@ -180,7 +255,9 @@ async function Page({ params, searchParams }: PageProps) {
                 {Object.values(grouped).map((season, i) => {
                   return (
                     <div key={i} className="flex flex-col gap-y-2">
-                      <h2 className="white font-bold text-lg">Season {i + 1}</h2>
+                      <h2 className="white font-bold text-lg">
+                        Season {i + 1}
+                      </h2>
                       <div className="flex flex-wrap gap-2">
                         {season.map((episode, i) => (
                           <Episode key={i} episode={episode} />
@@ -193,12 +270,16 @@ async function Page({ params, searchParams }: PageProps) {
             )}
             {!tab && (
               <div>
-                <h2 className="white font-bold text-lg mb-3">&quot;{result.tagline}&quot;</h2>
+                <h2 className="white font-bold text-lg mb-3">
+                  &quot;{result.tagline}&quot;
+                </h2>
                 {result.overview}
               </div>
             )}
-            {(!tab || tab === "discussion") && <Discussion id={Number(id)} full={tab ? true : false} />}
-            {tab === "people" && <People id={Number(id)} />}
+            {(!tab || tab === "discussion") && (
+              <Discussion id={Number(id)} full={tab ? true : false} />
+            )}
+            {tab === "people" && <People id={Number(id)} anime={result} />}
           </div>
         </div>
       </div>

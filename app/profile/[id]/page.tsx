@@ -12,6 +12,43 @@ import Image from "next/image";
 import Link from "next/link";
 import Follow from "./Follow";
 
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  const user = await prisma.user.findUnique({
+    where: { id: id },
+    include: { followers: true, following: true },
+  });
+  if (!user) redirect("/profile");
+  const title = user.name + "'s Profile | AniHub";
+  const description =
+    "Check out " +
+    user.name +
+    "'s public profile on AniHub here and see their favorite, currently watching, finished watching, and planned to watch anime series, as well as their profile and additional information!";
+  return {
+    title,
+    description,
+    authors: [{ name: "TonyMac129", url: "https://tonymac.net" }],
+    openGraph: {
+      title,
+      description,
+      url: `https://anihub-app.vercel.app/profile/${id}`,
+      siteName: "AniHub",
+      images: [
+        {
+          url: "/logo.png",
+          width: 50,
+          height: 50,
+        },
+      ],
+      type: "website",
+    },
+  };
+}
+
 async function Page({ params }: { params: Promise<{ id: string }> }) {
   const { id: userID } = await params;
   const user = await prisma.user.findUnique({
