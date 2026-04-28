@@ -11,12 +11,10 @@ import Comment from "@/components/anime/Comment";
 export default async function Home() {
   const session = await auth.api.getSession({ headers: await headers() });
   const results = await fetch(
-    "https://api.themoviedb.org/3/discover/tv?with_keywords=210024",
+    "https://api.themoviedb.org/3/discover/tv?with_keywords=210024&sort_by=vote_count.desc",
     tmdbOptions as RequestInit,
   ).then((res) => res.json());
-  const popularAnime: TmdbResponseType[] = results.results
-    .filter((result: TmdbResponseType) => result.vote_count > 100)
-    .slice(0, 10);
+  const popularAnime: TmdbResponseType[] = results.results.slice(0, 10);
   const ratings = await getRatings(popularAnime);
   const newestComments = await prisma.comment.findMany({
     orderBy: { createdAt: "desc" },

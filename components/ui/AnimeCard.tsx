@@ -5,7 +5,7 @@ import Link from "next/link";
 
 type AnimeCardProps = {
   anime: TmdbResponseType;
-  rating: RatingType;
+  rating?: RatingType;
   small?: boolean;
 };
 
@@ -23,12 +23,22 @@ function AnimeCard({ anime, rating, small }: AnimeCardProps) {
         height={200}
         className={small ? "w-[50%]" : "w-[70%]" + " h-38 rounded-lg!"}
       />
-      <h2 className="text-white font-bold text-center">{anime.name.slice(0, 30) + (anime.name.length > 30 ? "..." : "")}</h2>
-      {!small && <div className="text-sm">{new Date(anime.first_air_date).getFullYear()}</div>}
+      <h2 className="text-white font-bold text-center">
+        {anime.name.slice(0, 30) + (anime.name.length > 30 ? "..." : "")}
+      </h2>
+      {!small && (
+        <div className="text-sm">
+          {new Date(anime.first_air_date).getFullYear()}
+        </div>
+      )}
       <div className="flex items-center gap-x-1 font-bold text-sm">
-        <FaStar size={15} />
-        <span>{rating.rating}</span>
-        <span>({rating.count})</span>
+        {!small && (
+          <>
+            <FaStar size={15} />
+            <span>{rating!.rating}</span>
+            <span>({rating!.count})</span>
+          </>
+        )}
       </div>
     </Link>
   );

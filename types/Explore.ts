@@ -3,4 +3,5 @@ export interface GenreType {
   name: string;
   description: string;
   icon: React.ReactNode;
+  keyword: number;
 }

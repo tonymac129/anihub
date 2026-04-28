@@ -115,6 +115,7 @@ async function Page({ params, searchParams }: PageProps) {
     });
     favorited = favorite ? true : false;
   }
+  console.log(result);
 
   return (
     <div className="px-50">

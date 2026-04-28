@@ -4,7 +4,7 @@ import Link from "next/link";
 function Genre({ genre }: { genre: GenreType }) {
   return (
     <Link
-      href={"/genre/" + genre.id}
+      href={"/explore/" + genre.id}
       className="relative rounded-lg hover:bg-zinc-900 cursor-pointer flex flex-col p-5 border-2 border-zinc-700 gap-y-3 w-100"
     >
       <h2 className="text-white text-2xl font-bold">{genre.name}</h2>
