@@ -7,9 +7,10 @@ type AnimeCardProps = {
   anime: TmdbResponseType;
   rating?: RatingType;
   small?: boolean;
+  percent?: number;
 };
 
-function AnimeCard({ anime, rating, small }: AnimeCardProps) {
+function AnimeCard({ anime, rating, small, percent }: AnimeCardProps) {
   return (
     <Link
       href={"/anime/" + anime.id}
@@ -40,6 +41,19 @@ function AnimeCard({ anime, rating, small }: AnimeCardProps) {
           </>
         )}
       </div>
+      {percent && (
+        <div className="w-[90%] flex items-center gap-x-3 text-sm">
+          <div
+            style={
+              {
+                "--progress-width": `${Math.floor((percent / anime.number_of_episodes) * 100)}%`,
+              } as React.CSSProperties
+            }
+            className={`h-2 before:w-(--progress-width)  bg-zinc-800 before:bg-white before:content-[''] before:h-full before:absolute rounded-full overflow-hidden relative w-full `}
+          />
+          {Math.floor((percent / anime.number_of_episodes) * 100)}%
+        </div>
+      )}
     </Link>
   );
 }

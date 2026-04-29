@@ -24,3 +24,24 @@ export async function likeComment(commentID: string, animeID: number) {
     console.error("Error: " + err);
   }
 }
+
+export async function trackEpisodes(
+  episodes: number,
+  id: string,
+  animeID: number,
+  total: number,
+) {
+  try {
+    const session = await auth.api.getSession({ headers: await headers() });
+    await prisma.animeList.updateMany({
+      where: { AND: [{ id: id }, { userId: session?.user.id }] },
+      data: {
+        watched: episodes,
+        status: episodes == total ? "Finished" : "Watching",
+      },
+    });
+    revalidatePath(`/anime/${animeID}`);
+  } catch (err) {
+    console.error("Error: " + err);
+  }
+}

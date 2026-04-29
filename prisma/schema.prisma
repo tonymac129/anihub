@@ -110,6 +110,7 @@ model AnimeList {
   animeId Int
   anime   Anime  @relation(fields: [animeId], references: [id], onDelete: Cascade)
   status  String
+  watched Int?   @default(0)
 
   @@unique([userId, animeId])
 }

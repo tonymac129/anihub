@@ -9,6 +9,7 @@ import { tmdbOptions } from "@/lib/tmdb";
 import { notFound } from "next/navigation";
 import { FaGlobe, FaStar } from "react-icons/fa";
 import { addList, addFavorite } from "./actions";
+import { trackEpisodes } from "@/components/anime/actions";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import prisma from "@/lib/db";
@@ -20,6 +21,7 @@ import Discussion from "./Discussion";
 import Track from "@/components/anime/Track";
 import Favorite from "@/components/anime/Favorite";
 import People from "@/components/anime/People";
+import TrackEpisodes from "@/components/anime/TrackEpisodes";
 
 type GroupedType = Record<string, EpisodeType[]>;
 
@@ -115,7 +117,6 @@ async function Page({ params, searchParams }: PageProps) {
     });
     favorited = favorite ? true : false;
   }
-  console.log(result);
 
   return (
     <div className="px-50">
@@ -155,17 +156,28 @@ async function Page({ params, searchParams }: PageProps) {
             </div>
           </div>
           {session?.user && (
-            <div className="flex gap-x-3">
-              <Track
-                status={animeList?.status}
-                animeId={Number(id)}
-                addList={addList}
-              />
-              <Favorite
-                animeId={Number(id)}
-                favoritedBefore={favorited}
-                addFavorite={addFavorite}
-              />
+            <div className="flex flex-col gap-y-3">
+              <div className="flex gap-x-3">
+                <Track
+                  status={animeList?.status}
+                  animeId={Number(id)}
+                  addList={addList}
+                />
+                <Favorite
+                  animeId={Number(id)}
+                  favoritedBefore={favorited}
+                  addFavorite={addFavorite}
+                />
+              </div>
+              {animeList?.status === "Watching" && (
+                <TrackEpisodes
+                  watched={animeList?.watched as number}
+                  total={result.number_of_episodes}
+                  listID={animeList?.id as string}
+                  animeID={result.id}
+                  trackEpisodes={trackEpisodes}
+                />
+              )}
             </div>
           )}
           <div className="flex flex-col gap-y-1 text-sm">
@@ -256,8 +268,20 @@ async function Page({ params, searchParams }: PageProps) {
                 {Object.values(grouped).map((season, i) => {
                   return (
                     <div key={i} className="flex flex-col gap-y-2">
-                      <h2 className="white font-bold text-lg">
-                        Season {i + 1}
+                      <h2 className="white font-bold flex gap-x-3 items-center text-lg">
+                        Season {i + 1}{" "}
+                        <span className="text-sm">
+                          (average{" "}
+                          {Math.round(
+                            (season.reduce(
+                              (acc, ep) => (acc += ep.rating.aggregateRating),
+                              0,
+                            ) /
+                              season.length) *
+                              10,
+                          ) / 10}
+                          )
+                        </span>
                       </h2>
                       <div className="flex flex-wrap gap-2">
                         {season.map((episode, i) => (

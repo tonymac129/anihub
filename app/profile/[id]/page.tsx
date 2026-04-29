@@ -213,6 +213,7 @@ async function Page({ params }: { params: Promise<{ id: string }> }) {
                   anime={anime}
                   rating={watchingRatings[i]}
                   small
+                  percent={watchingAnime[i].watched as number}
                 />
               ))
             ) : (

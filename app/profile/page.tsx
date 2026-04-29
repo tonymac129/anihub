@@ -205,6 +205,7 @@ async function Page() {
                   anime={anime}
                   rating={watchingRatings[i]}
                   small
+                  percent={watchingAnime[i].watched as number}
                 />
               ))
             ) : (

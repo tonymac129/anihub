@@ -56,6 +56,12 @@ export async function addList(animeId: number, status: string) {
           data: { status: status },
         });
       } else {
+        const existingAnime = await prisma.anime.findUnique({
+          where: { id: animeId },
+        });
+        if (!existingAnime) {
+          await prisma.anime.create({ data: { id: animeId } });
+        }
         await prisma.animeList.create({
           data: {
             animeId: animeId,

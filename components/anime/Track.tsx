@@ -35,7 +35,11 @@ function Track({ status, animeId, addList }: TrackProps) {
 
   return (
     <div ref={listMenuRef} className="flex flex-col relative flex-1">
-      <Button text={status || "Add to list"} onclick={() => setOpen(!open)} primary={status ? false : true} />
+      <Button
+        text={status || "Add to list"}
+        onclick={() => setOpen(!open)}
+        primary={status ? false : true}
+      />
       <AnimatePresence>
         {open && (
           <motion.div
@@ -43,7 +47,7 @@ function Track({ status, animeId, addList }: TrackProps) {
             animate={{ opacity: 1, scaleY: 1 }}
             exit={{ opacity: 0, scaleY: 0 }}
             className="absolute top-[110%] left-0 w-full bg-zinc-950 border-2 border-zinc-800 rounded-lg flex
-            flex-col p-2 origin-top"
+            flex-col p-2 origin-top z-10"
           >
             {statuses.map((status, i) => (
               <div
