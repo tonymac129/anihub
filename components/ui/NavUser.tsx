@@ -10,7 +10,8 @@ import { usePathname } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 
-const menuItemStyles = "px-3 py-2 block rounded-lg cursor-pointer hover:bg-zinc-900 flex items-center gap-x-3";
+const menuItemStyles =
+  "px-3 py-2 block rounded-lg cursor-pointer hover:bg-zinc-900 flex items-center gap-x-3";
 
 function NavUser({ user }: { user: User }) {
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
@@ -40,8 +41,12 @@ function NavUser({ user }: { user: User }) {
   }
 
   return (
-    <div onClick={() => setMenuOpen(true)} className="relative  text-zinc-300" ref={menuRef}>
-      <div className="hover:bg-zinc-900 flex gap-x-2 cursor-pointer items-center border-zinc-800 rounded-lg px-2 py-1">
+    <div
+      onClick={() => setMenuOpen(true)}
+      className="relative  text-zinc-300 w-full"
+      ref={menuRef}
+    >
+      <div className="hover:bg-zinc-900 flex gap-x-2 cursor-pointer items-center border-zinc-800 rounded-lg px-2 py-1 w-35">
         {user.image ? (
           <Image
             src={user.image as string}
@@ -51,7 +56,10 @@ function NavUser({ user }: { user: User }) {
             className="rounded-full border-2 border-zinc-800"
           />
         ) : (
-          <FaUserCircle size={35} className="rounded-full border-2 border-zinc-800" />
+          <FaUserCircle
+            size={35}
+            className="rounded-full border-2 border-zinc-800"
+          />
         )}
         {user.name}
       </div>

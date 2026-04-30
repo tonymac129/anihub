@@ -274,7 +274,7 @@ async function Page({ params, searchParams }: PageProps) {
                           (average{" "}
                           {Math.round(
                             (season.reduce(
-                              (acc, ep) => (acc += ep.rating.aggregateRating),
+                              (acc, ep) => (acc += ep?.rating?.aggregateRating),
                               0,
                             ) /
                               season.length) *
