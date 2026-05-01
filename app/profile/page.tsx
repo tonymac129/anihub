@@ -5,7 +5,7 @@ import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { FaUserCircle, FaGlobe } from "react-icons/fa";
-import { getRatings, tmdbOptions } from "@/lib/tmdb";
+import { tmdbOptions } from "@/lib/tmdb";
 import prisma from "@/lib/db";
 import EditProfile from "./EditProfile";
 import Image from "next/image";
@@ -57,7 +57,6 @@ async function Page() {
       return result;
     }),
   );
-  const favoriteRatings = await getRatings(favoriteResponses);
   const watchingAnime = await prisma.animeList.findMany({
     where: { userId: session.user.id, status: "Watching" },
   });
@@ -70,7 +69,6 @@ async function Page() {
       return result;
     }),
   );
-  const watchingRatings = await getRatings(watchingResponses);
   const finishedAnime = await prisma.animeList.findMany({
     where: { userId: session.user.id, status: "Finished" },
   });
@@ -83,7 +81,6 @@ async function Page() {
       return result;
     }),
   );
-  const finishedRatings = await getRatings(finishedResponses);
   const plannedAnime = await prisma.animeList.findMany({
     where: { userId: session.user.id, status: "Planned to watch" },
   });
@@ -96,10 +93,9 @@ async function Page() {
       return result;
     }),
   );
-  const plannedRatings = await getRatings(plannedResponses);
 
   return (
-    <div className="px-50 flex gap-x-10 py-5 pb-10">
+    <div className="flex gap-x-10 py-5 pb-10">
       <div className="flex-1 flex flex-col gap-y-5 text-zinc-300">
         {user.image ? (
           <Image
@@ -177,13 +173,8 @@ async function Page() {
           </h2>
           <div className="flex flex-wrap gap-5">
             {favoriteResponses.length > 0 ? (
-              favoriteResponses.map((anime, i) => (
-                <AnimeCard
-                  key={anime.id}
-                  anime={anime}
-                  rating={favoriteRatings[i]}
-                  small
-                />
+              favoriteResponses.map((anime) => (
+                <AnimeCard key={anime.id} anime={anime} small />
               ))
             ) : (
               <div className="text-zinc-400 text-sm">
@@ -203,7 +194,6 @@ async function Page() {
                 <AnimeCard
                   key={anime.id}
                   anime={anime}
-                  rating={watchingRatings[i]}
                   small
                   percent={watchingAnime[i].watched as number}
                 />
@@ -222,13 +212,8 @@ async function Page() {
           </h2>
           <div className="flex flex-wrap gap-5">
             {finishedResponses.length > 0 ? (
-              finishedResponses.map((anime, i) => (
-                <AnimeCard
-                  key={anime.id}
-                  anime={anime}
-                  rating={finishedRatings[i]}
-                  small
-                />
+              finishedResponses.map((anime) => (
+                <AnimeCard key={anime.id} anime={anime} small />
               ))
             ) : (
               <div className="text-zinc-400 text-sm">
@@ -244,13 +229,8 @@ async function Page() {
           </h2>
           <div className="flex flex-wrap gap-5">
             {plannedResponses.length > 0 ? (
-              plannedResponses.map((anime, i) => (
-                <AnimeCard
-                  key={anime.id}
-                  anime={anime}
-                  rating={plannedRatings[i]}
-                  small
-                />
+              plannedResponses.map((anime) => (
+                <AnimeCard key={anime.id} anime={anime} small />
               ))
             ) : (
               <div className="text-zinc-400 text-sm">

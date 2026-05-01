@@ -29,7 +29,7 @@ function Page() {
         title="About AniHub"
         description="Learn more about what AniHub is, how to use it, its features, and more information about the anime tracking platform here!"
       />
-      <div className="flex flex-col gap-y-5 px-50 items-center pb-15">
+      <div className="flex flex-col gap-y-5 items-center pb-15">
         <h2 className="text-2xl font-bold text-center text-white">
           What is AniHub?
         </h2>
@@ -43,7 +43,7 @@ function Page() {
           and explore everything the anime tracking platform has to offer!
         </p>
       </div>
-      <div className="flex flex-col gap-y-5 px-50 items-center pb-15">
+      <div className="flex flex-col gap-y-5 items-center pb-15">
         <h2 className="text-2xl font-bold text-center text-white">
           What&apos;s Different About It?
         </h2>

@@ -3,18 +3,19 @@
 import type { TmdbResponseType } from "@/types/Anime";
 import { searchAnime } from "./actions";
 import { useState, useEffect, useRef } from "react";
+import { usePathname } from "next/navigation";
+import SearchResult from "./SearchResult";
 import Input from "../ui/Input";
-import Link from "next/link";
 
 function Search() {
   const [search, setSearch] = useState<string>("");
   const [searching, setSearching] = useState<boolean>(false);
   const [displayed, setDisplayed] = useState<TmdbResponseType[]>([]);
   const searchRef = useRef<HTMLFormElement>(null);
+  const pathname = usePathname();
 
   useEffect(() => {
     const clickListener = (e: Event) => {
-      console.log("hi");
       if (!searchRef.current?.contains(e.target as Node)) {
         setSearching(false);
       }
@@ -25,6 +26,11 @@ function Search() {
       document.removeEventListener("click", clickListener);
     };
   }, []);
+
+  useEffect(() => {
+    setSearch("");
+    setSearching(false);
+  }, [pathname]);
 
   async function handleSubmit(e: React.SubmitEvent) {
     e.preventDefault();
@@ -45,20 +51,14 @@ function Search() {
         className={searching ? "rounded-b-none" : ""}
       />
       {searching && (
-        <div className="absolute top-[calc(100%-2px)] border-2 border-zinc-800 rounded-b-lg border-t-0 left-0 w-full bg-zinc-950 flex flex-col overflow-hidden">
+        <div className="absolute top-[calc(100%-2px)] border-2 border-zinc-800 rounded-b-lg border-t-0 left-0 w-full bg-zinc-950 flex flex-col overflow-hidden z-10">
           {displayed.length > 0 ? (
-            displayed.map((entry) => (
-              <Link
-                href={"/anime/" + entry.id}
-                key={entry.id}
-                className="px-4 py-2 hover:bg-zinc-900 text-zinc-300"
-              >
-                {entry.name}
-              </Link>
-            ))
+            displayed
+              .slice(0, 5)
+              .map((entry) => <SearchResult key={entry.id} entry={entry} />)
           ) : (
             <div className="text-zinc-300 text-sm px-4 py-2">
-              Oops, nothing found, maybe try searching for another one?
+              Oops, nothing found, maybe try searching another name?
             </div>
           )}
         </div>

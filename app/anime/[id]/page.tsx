@@ -117,9 +117,10 @@ async function Page({ params, searchParams }: PageProps) {
     });
     favorited = favorite ? true : false;
   }
+  console.log(result);
 
   return (
-    <div className="px-50">
+    <div>
       <div className="h-50 overflow-hidden w-full flex items-center rounded-b-lg border-2 border-zinc-800 border-t-0">
         <Image
           src={"https://image.tmdb.org/t/p/original/" + result.backdrop_path}

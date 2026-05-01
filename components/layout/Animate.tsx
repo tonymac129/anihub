@@ -12,6 +12,7 @@ function Animate({ children }: { children: React.ReactNode }) {
       initial={{ y: 200, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.7, type: "spring" }}
+      className="max-w-350 mx-auto px-5 md:px-15 xl:px-50"
     >
       {children}
     </motion.div>

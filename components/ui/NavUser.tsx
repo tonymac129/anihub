@@ -46,7 +46,7 @@ function NavUser({ user }: { user: User }) {
       className="relative  text-zinc-300 w-full"
       ref={menuRef}
     >
-      <div className="hover:bg-zinc-900 flex gap-x-2 cursor-pointer items-center border-zinc-800 rounded-lg px-2 py-1 w-35">
+      <div className="hover:bg-zinc-900 flex gap-x-2 cursor-pointer items-center border-zinc-800 rounded-lg px-2 py-1 md:w-35">
         {user.image ? (
           <Image
             src={user.image as string}
@@ -61,7 +61,7 @@ function NavUser({ user }: { user: User }) {
             className="rounded-full border-2 border-zinc-800"
           />
         )}
-        {user.name}
+        <span className="hidden md:inline">{user.name}</span>
       </div>
       <AnimatePresence>
         {menuOpen && (

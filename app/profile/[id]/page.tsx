@@ -114,7 +114,7 @@ async function Page({ params }: { params: Promise<{ id: string }> }) {
   const plannedRatings = await getRatings(plannedResponses);
 
   return (
-    <div className="px-50 flex gap-x-10 py-5 pb-10">
+    <div className="flex gap-x-10 py-5 pb-10">
       <div className="flex-1 flex flex-col gap-y-5 text-zinc-300">
         {user.image ? (
           <Image
