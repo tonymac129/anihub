@@ -46,7 +46,6 @@ async function Page() {
     )
     .sort((a, b) => b.vote_count - a.vote_count)
     .slice(0, 15);
-  const ratings = await getRatings(airingAnime);
 
   return (
     <div>
@@ -56,7 +55,7 @@ async function Page() {
       />
       <div className="flex flex-wrap gap-5 justify-center pb-15">
         {airingAnime.map((anime, i) => (
-          <AnimeCard key={anime.id} anime={anime} rating={ratings[i]} />
+          <AnimeCard key={anime.id} anime={anime} small />
         ))}
       </div>
     </div>
