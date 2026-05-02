@@ -47,7 +47,6 @@ async function Page() {
     .sort((a, b) => b.vote_count - a.vote_count)
     .slice(0, 15);
   const ratings = await getRatings(airingAnime);
-  console.log(airingAnime);
 
   return (
     <div>
