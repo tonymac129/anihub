@@ -81,7 +81,7 @@ async function Page({ params, searchParams }: PageProps) {
   let pageToken = null;
   for (
     let i = 0;
-    i < Math.min(Math.ceil(result.number_of_episodes / 50), 10);
+    i < Math.min(Math.ceil(result.number_of_episodes / 50), 6);
     i++
   ) {
     const episodeBatch: { episodes: EpisodeType[]; nextPageToken: string } =
@@ -117,7 +117,6 @@ async function Page({ params, searchParams }: PageProps) {
     });
     favorited = favorite ? true : false;
   }
-  console.log(result);
 
   return (
     <div>

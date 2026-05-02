@@ -16,7 +16,7 @@ async function Nav() {
       <div className="bg-zinc-950 flex items-center justify-between gap-x-10 py-3 max-w-350 mx-auto px-5 md:px-15 xl:px-50">
         <Link
           href="/"
-          className="font-bold text-xl text-white flex gap-x-3 items-center pr-10"
+          className="font-bold text-xl text-white flex gap-x-3 items-center"
         >
           <Image
             src="/logo.png"

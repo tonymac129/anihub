@@ -43,7 +43,7 @@ function Search() {
   }
 
   return (
-    <form onSubmit={handleSubmit} ref={searchRef} className="relative w-full">
+    <form onSubmit={handleSubmit} ref={searchRef} className="relative flex-1">
       <Input
         value={search}
         setValue={setSearch}
